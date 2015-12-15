@@ -91,6 +91,7 @@ main:
 ; Entry point
 _start:
   call main
+  ret
 
 message:
   db      'Hello, World', 10
