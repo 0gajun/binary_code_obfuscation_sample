@@ -7,25 +7,35 @@
   section .text
 
 call_stack_tamper1:
-  push    hello
   push    call_stack_tamper2
+
   mov     ebp, esp
   sub     esp, 4
+  push    ecx
   push    0
   lea     eax, [ebp - 4]
   push    eax
-  push    (tamper_now_end - tamper_now)
-  push    tamper_now
+  push    (tamper_now1_end - tamper_now1)
+  push    tamper_now1
   push    ebx
   call    _WriteFile@20
+  pop     ecx
   add     esp, 4
   ret
 
 call_stack_tamper2:
+  add     ecx, 0x50
+  add     ecx, 0xD5
+  push    ecx
   ret
 
 hello:
+  ; Not Execute this insn
   mov     ebp, esp
+  ; Function starts from this insn(hello + 2)
+  mov     ebp, esp
+
+  ; print message
   sub     esp, 4
   push    0
   lea     eax, [ebp - 4]
@@ -34,10 +44,8 @@ hello:
   push    not_return_msg
   push    ebx
   call    _WriteFile@20
-  call    exit
-  ret
 
-nothing_to_do_func:
+  call    exit
   ret
 
 exit:
@@ -52,6 +60,11 @@ main:
   mov     ebp, esp
   sub     esp,  4
 
+  ; Obfuscate constants(use for call-stack-tampering
+  mov     ecx, hello + 2
+  sub     ecx, 0x100
+  sub     ecx, 0x025
+
   ; hStdOut = GetStdHandle(STD_OUTPUT_HANDLE)
   ;       (STD_OUTPUT_HANDLE = -11)
   push    -11
@@ -59,6 +72,7 @@ main:
   mov     ebx, eax
 
   call    call_stack_tamper1
+  ; Never return below
 
   ; show 'Hello, World'
   ; WriteFile( hStdOut, msg, length(msg), &size, 0)
@@ -86,6 +100,6 @@ not_return_msg:
   db      'Call Stack Tampered', 10
 not_return_msg_end:
 
-tamper_now:
-  db      'Tamper Now...', 10
-tamper_now_end:
+tamper_now1:
+  db      'Tamper Now1...', 10
+tamper_now1_end:
