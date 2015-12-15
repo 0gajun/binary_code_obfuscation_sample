@@ -43,6 +43,9 @@ print_msg:
   push  0
   call  _ExitProcess@4
 
+  ; Never reach here
+  ret
+
 _start:
   mov   eax, 0xebb907eb
   seto  bl
