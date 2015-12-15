@@ -1,0 +1,6 @@
+*.obj
+
+# For IDA files
+*.id*
+*.nam
+*.til
