@@ -6,9 +6,13 @@
 
   section .text
 
-not_ret_func:
+not_ret_func1:
   mov     eax, 10
   pop     eax
+  ret
+
+not_ret_func2:
+  mov     eax, 20
   ret
 
 not_returned:
@@ -22,6 +26,9 @@ not_returned:
   push    ebx
   call    _WriteFile@20
   call    exit
+  ret
+
+nothing_to_do_func:
   ret
 
 exit:
@@ -43,6 +50,7 @@ main:
 
   ; prepare for non-returning calls
   push    not_returned
+  push    not_ret_func2
 
   ; hStdOut = GetStdHandle(STD_OUTPUT_HANDLE)
   ;       (STD_OUTPUT_HANDLE = -11)
@@ -61,9 +69,14 @@ loop:
   push    ebx
   call    _WriteFile@20
 
-  call    not_ret_func
+  call    not_ret_func1
 
- ; i += 1
+  ; Never execute below
+dumy:
+  db      'Hello, World', 10
+dumy_end:
+
+  ; i += 1
   mov     eax, dword [ebp - 8]
   add     eax, 1
   mov     dword [ebp - 8], eax
